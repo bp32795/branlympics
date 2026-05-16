@@ -1,15 +1,6 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { auth } from "@/auth";
 
-export const dynamic = "force-dynamic";
-
-export default async function HomePage() {
-  const session = await auth();
-  if (session?.user) {
-    redirect("/games");
-  }
-
+export default function HomePage() {
   return (
     <div className="text-center py-16 space-y-10">
       <div>
