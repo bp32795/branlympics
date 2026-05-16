@@ -83,11 +83,14 @@ export async function updateUser(user: User): Promise<User> {
 export async function listGames(): Promise<Game[]> {
   const c = await getContainer("games");
   const { resources } = await c.items
-    .query<Game>(
-      "SELECT * FROM c ORDER BY (c.scheduledFor ?? c.createdAt) ASC",
-    )
+    .query<Game>("SELECT * FROM c")
     .fetchAll();
-  return resources;
+  // Cosmos SQL ORDER BY does not support expressions, so sort in memory.
+  return [...resources].sort((a, b) => {
+    const ka = a.scheduledFor ?? a.createdAt;
+    const kb = b.scheduledFor ?? b.createdAt;
+    return ka < kb ? -1 : ka > kb ? 1 : 0;
+  });
 }
 
 export async function getGame(id: string): Promise<Game | null> {
