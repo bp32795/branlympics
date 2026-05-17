@@ -1,17 +1,17 @@
 import Link from "next/link";
-import { auth } from "@/auth";
 import { listGames, listSignupsForUser } from "@/lib/repo";
+import { requireUser } from "@/app/actions/auth";
 import { SignupToggleButton } from "@/components/signup-toggle-button";
 import { BulkSignupPanel } from "@/components/bulk-signup-panel";
 
 export const dynamic = "force-dynamic";
 
 export default async function GamesPage() {
-  const session = await auth();
-  const userId = session?.user?.id;
+  const me = await requireUser();
+  const userId = me.id;
   const [games, mySignups] = await Promise.all([
     listGames(),
-    userId ? listSignupsForUser(userId) : Promise.resolve([]),
+    listSignupsForUser(userId),
   ]);
   const signedUp = new Set(mySignups.map((s) => s.gameId));
 
@@ -19,7 +19,7 @@ export default async function GamesPage() {
     <div className="space-y-6">
       <div className="flex items-baseline justify-between">
         <h1 className="text-3xl font-bold">Games</h1>
-        {session?.user?.isAdmin && (
+        {me.isAdmin && (
           <Link
             href="/admin/games"
             className="text-sm text-amber-400 hover:underline"
@@ -29,20 +29,11 @@ export default async function GamesPage() {
         )}
       </div>
 
-      {!session && (
-        <div className="border border-zinc-800 rounded-lg p-4 text-sm text-zinc-400">
-          <Link href="/signin" className="text-amber-400 hover:underline">
-            Sign in
-          </Link>{" "}
-          to sign up for games and team up.
-        </div>
-      )}
-
       {games.length === 0 && (
         <p className="text-zinc-500">No games yet — check back soon.</p>
       )}
 
-      {userId && games.length > 0 && (
+      {games.length > 0 && (
         <BulkSignupPanel
           games={games.map((g) => ({
             id: g.id,
@@ -81,7 +72,7 @@ export default async function GamesPage() {
                   </span>
                 </div>
               </div>
-              {userId && (
+              {(
                 <SignupToggleButton
                   gameId={g.id}
                   isSignedUp={signedUp.has(g.id)}

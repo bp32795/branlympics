@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { auth } from "@/auth";
+import { requireUser } from "@/app/actions/auth";
 import {
   getGame,
   listSignupsForGame,
@@ -21,8 +21,7 @@ interface PageProps {
 
 export default async function GameDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const session = await auth();
-  const me = session?.user;
+  const me = await requireUser();
 
   const [game, signups, allUsers, teamRequests] = await Promise.all([
     getGame(id),
@@ -33,7 +32,7 @@ export default async function GameDetailPage({ params }: PageProps) {
   if (!game) notFound();
 
   const usersById = new Map(allUsers.map((u) => [u.id, u]));
-  const mySignup = me ? signups.find((s) => s.userId === me.id) : undefined;
+  const mySignup = signups.find((s) => s.userId === me.id);
   const isSignedUp = Boolean(mySignup);
   const allowsTeams = game.maxTeamSize > 1;
 
