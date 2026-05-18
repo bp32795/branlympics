@@ -22,7 +22,7 @@ export default async function GamesPage() {
         {me.isAdmin && (
           <Link
             href="/admin/games"
-            className="text-sm text-amber-400 hover:underline"
+            className="text-sm text-fuchsia-300 hover:underline"
           >
             + Add a game
           </Link>
@@ -47,13 +47,13 @@ export default async function GamesPage() {
         {games.map((g) => (
           <li
             key={g.id}
-            className="border border-zinc-800 rounded-lg p-4 hover:border-amber-500/50 transition-colors"
+            className="border border-zinc-800 rounded-lg p-4 hover:border-fuchsia-500/50 transition-colors"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <Link
                   href={`/games/${g.id}`}
-                  className="text-xl font-semibold hover:text-amber-300"
+                  className="text-xl font-semibold hover:text-fuchsia-300"
                 >
                   {g.title}
                 </Link>

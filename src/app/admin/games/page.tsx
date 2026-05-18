@@ -17,7 +17,7 @@ export default async function AdminGamesPage() {
         <h1 className="text-3xl font-bold">Admin · Games</h1>
         <Link
           href="/admin/users"
-          className="text-sm text-amber-400 hover:underline"
+          className="text-sm text-fuchsia-300 hover:underline"
         >
           Manage users →
         </Link>
@@ -36,7 +36,7 @@ export default async function AdminGamesPage() {
               >
                 <Link
                   href={`/games/${g.id}`}
-                  className="hover:text-amber-300"
+                  className="hover:text-fuchsia-300"
                 >
                   {g.title}
                 </Link>

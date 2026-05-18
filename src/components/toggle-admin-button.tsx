@@ -18,7 +18,7 @@ export function ToggleAdminButton({
       type="button"
       disabled={pending || disabled}
       onClick={() => start(() => setUserAdminAction(userId, !isAdmin))}
-      className="text-xs px-2.5 py-1 rounded border border-zinc-700 hover:border-amber-400 disabled:opacity-50"
+      className="text-xs px-2.5 py-1 rounded border border-zinc-700 hover:border-fuchsia-300 disabled:opacity-50"
     >
       {pending ? "…" : isAdmin ? "Revoke admin" : "Make admin"}
     </button>

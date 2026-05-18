@@ -41,7 +41,7 @@ export default async function AccountPage() {
         <h2 className="font-semibold mb-2">Games I'm in</h2>
         {games.length === 0 ? (
           <p className="text-sm text-zinc-500">
-            None yet — <Link href="/games" className="text-amber-400 hover:underline">browse games</Link>.
+            None yet — <Link href="/games" className="text-fuchsia-300 hover:underline">browse games</Link>.
           </p>
         ) : (
           <ul className="divide-y divide-zinc-800 border border-zinc-800 rounded-lg">
@@ -49,11 +49,11 @@ export default async function AccountPage() {
               (g, i) =>
                 g && (
                   <li key={signups[i].id} className="px-3 py-2 text-sm">
-                    <Link href={`/games/${g.id}`} className="hover:text-amber-300">
+                    <Link href={`/games/${g.id}`} className="hover:text-fuchsia-300">
                       {g.title}
                     </Link>
                     {signups[i].teamId && (
-                      <span className="ml-2 text-xs text-amber-400">teamed up</span>
+                      <span className="ml-2 text-xs text-fuchsia-300">teamed up</span>
                     )}
                   </li>
                 ),
@@ -75,7 +75,7 @@ export default async function AccountPage() {
                 >
                   <span>
                     <strong>{fromUsers[i]?.name ?? "Someone"}</strong> for{" "}
-                    <Link href={`/games/${r.gameId}`} className="hover:text-amber-300">
+                    <Link href={`/games/${r.gameId}`} className="hover:text-fuchsia-300">
                       {g?.title ?? "a game"}
                     </Link>
                   </span>
@@ -100,7 +100,7 @@ export default async function AccountPage() {
                 >
                   <span>
                     To <strong>{toUsers[i]?.name ?? "?"}</strong> for{" "}
-                    <Link href={`/games/${r.gameId}`} className="hover:text-amber-300">
+                    <Link href={`/games/${r.gameId}`} className="hover:text-fuchsia-300">
                       {g?.title ?? "a game"}
                     </Link>
                   </span>

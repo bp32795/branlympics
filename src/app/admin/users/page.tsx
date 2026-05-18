@@ -20,7 +20,7 @@ export default async function AdminUsersPage() {
               <div className="font-medium">
                 {u.name}
                 {u.isAdmin && (
-                  <span className="ml-2 text-xs text-amber-400">admin</span>
+                  <span className="ml-2 text-xs text-fuchsia-300">admin</span>
                 )}
               </div>
               <div className="text-xs text-zinc-500">{u.email}</div>

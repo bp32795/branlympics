@@ -22,7 +22,7 @@ export function AddGameForm() {
           name="description"
           required
           rows={4}
-          className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500"
+          className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:border-fuchsia-500"
         />
       </label>
       <Field label="Location (optional)" name="location" />
@@ -39,7 +39,7 @@ export function AddGameForm() {
       <button
         type="submit"
         disabled={pending}
-        className="px-4 py-2 rounded-md bg-amber-500 text-black font-semibold hover:bg-amber-400 disabled:opacity-50"
+        className="px-4 py-2 rounded-md bg-fuchsia-500 text-black font-semibold hover:bg-fuchsia-300 disabled:opacity-50"
       >
         {pending ? "Saving…" : "Add game + notify everyone"}
       </button>
@@ -73,7 +73,7 @@ function Field({
       <span className="text-zinc-300">{label}</span>
       <input
         {...props}
-        className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500"
+        className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:border-fuchsia-500"
       />
     </label>
   );

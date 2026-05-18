@@ -53,10 +53,10 @@ export function BulkSignupPanel({ games }: { games: GameLite[] }) {
       <div className="flex items-center justify-between">
         <h2 className="font-semibold">Bulk sign-up</h2>
         <div className="text-xs text-zinc-400 flex gap-3">
-          <button onClick={selectAll} className="hover:text-amber-400">
+          <button onClick={selectAll} className="hover:text-fuchsia-300">
             Select all
           </button>
-          <button onClick={selectNone} className="hover:text-amber-400">
+          <button onClick={selectNone} className="hover:text-fuchsia-300">
             Clear
           </button>
         </div>
@@ -68,14 +68,14 @@ export function BulkSignupPanel({ games }: { games: GameLite[] }) {
       <ul className="grid sm:grid-cols-2 gap-1.5">
         {games.map((g) => (
           <li key={g.id}>
-            <label className="flex items-center gap-2 text-sm cursor-pointer hover:text-amber-300">
+            <label className="flex items-center gap-2 text-sm cursor-pointer hover:text-fuchsia-300">
               <input
                 type="checkbox"
                 checked={selected.has(g.id)}
                 onChange={() => toggle(g.id)}
-                className="accent-amber-500"
+                className="accent-fuchsia-500"
               />
-              <span className={g.alreadySignedUp ? "text-amber-400" : ""}>
+              <span className={g.alreadySignedUp ? "text-fuchsia-300" : ""}>
                 {g.title}
               </span>
             </label>
@@ -87,7 +87,7 @@ export function BulkSignupPanel({ games }: { games: GameLite[] }) {
           type="button"
           disabled={pending}
           onClick={submit}
-          className="px-4 py-2 rounded-md bg-amber-500 text-black font-semibold hover:bg-amber-400 disabled:opacity-50"
+          className="px-4 py-2 rounded-md bg-fuchsia-500 text-black font-semibold hover:bg-fuchsia-300 disabled:opacity-50"
         >
           {pending ? "Signing up…" : "Sign me up for all selected"}
         </button>

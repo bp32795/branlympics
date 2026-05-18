@@ -21,8 +21,8 @@ export function SignupToggleButton({
       className={
         className ??
         (isSignedUp
-          ? "px-4 py-2 rounded-md border border-amber-500 text-amber-400 hover:bg-amber-500/10 disabled:opacity-50"
-          : "px-4 py-2 rounded-md bg-amber-500 text-black font-semibold hover:bg-amber-400 disabled:opacity-50")
+          ? "px-4 py-2 rounded-md border border-fuchsia-500 text-fuchsia-300 hover:bg-fuchsia-500/10 disabled:opacity-50"
+          : "px-4 py-2 rounded-md bg-fuchsia-500 text-black font-semibold hover:bg-fuchsia-300 disabled:opacity-50")
       }
     >
       {pending ? "…" : isSignedUp ? "✓ Signed up — click to remove" : "I'm in"}

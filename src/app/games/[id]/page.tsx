@@ -69,7 +69,7 @@ export default async function GameDetailPage({ params }: PageProps) {
       <div>
         <Link
           href="/games"
-          className="text-sm text-zinc-400 hover:text-amber-400"
+          className="text-sm text-zinc-400 hover:text-fuchsia-300"
         >
           ← All games
         </Link>
@@ -99,7 +99,7 @@ export default async function GameDetailPage({ params }: PageProps) {
         </div>
       ) : (
         <div className="border border-zinc-800 rounded-lg p-4 text-sm text-zinc-400">
-          <Link href="/signin" className="text-amber-400 hover:underline">
+          <Link href="/signin" className="text-fuchsia-300 hover:underline">
             Sign in
           </Link>{" "}
           to sign up.
@@ -107,8 +107,8 @@ export default async function GameDetailPage({ params }: PageProps) {
       )}
 
       {myIncoming.length > 0 && (
-        <section className="border border-amber-500/40 rounded-lg p-4 space-y-2 bg-amber-500/5">
-          <h2 className="font-semibold text-amber-300">Team-up requests</h2>
+        <section className="border border-fuchsia-500/40 rounded-lg p-4 space-y-2 bg-fuchsia-500/5">
+          <h2 className="font-semibold text-fuchsia-300">Team-up requests</h2>
           <ul className="space-y-2">
             {myIncoming.map((r) => {
               const from = usersById.get(r.fromUserId);
@@ -144,7 +144,7 @@ export default async function GameDetailPage({ params }: PageProps) {
                   key={teamId}
                   className="border border-zinc-800 rounded-lg p-3"
                 >
-                  <div className="text-xs uppercase text-amber-400 mb-1">
+                  <div className="text-xs uppercase text-fuchsia-300 mb-1">
                     Team {i + 1}
                   </div>
                   <ul className="text-sm space-y-0.5">
