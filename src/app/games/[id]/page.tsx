@@ -74,6 +74,14 @@ export default async function GameDetailPage({ params }: PageProps) {
           ← All games
         </Link>
         <h1 className="text-3xl font-bold mt-2">{game.title}</h1>
+        {game.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={game.imageUrl}
+            alt=""
+            className="mt-4 w-full max-h-80 object-cover rounded-lg border border-fuchsia-500/40 shadow-[0_0_28px_rgba(255,43,214,0.2)]"
+          />
+        )}
         <div className="text-xs text-zinc-500 mt-2 flex flex-wrap gap-3">
           {game.scheduledFor && (
             <span>📅 {new Date(game.scheduledFor).toLocaleString()}</span>

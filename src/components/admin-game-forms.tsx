@@ -4,8 +4,11 @@ import { useActionState, useTransition } from "react";
 import {
   createGameAction,
   deleteGameAction,
+  setGameImageAction,
   type GameFormState,
+  type ImageFormState,
 } from "@/app/actions/games";
+import { GameImagePicker } from "@/components/game-image-picker";
 
 export function AddGameForm() {
   const [state, action, pending] = useActionState<GameFormState, FormData>(
@@ -35,6 +38,7 @@ export function AddGameForm() {
         <Field label="Min team size" name="minTeamSize" type="number" defaultValue={1} min={1} required />
         <Field label="Max team size" name="maxTeamSize" type="number" defaultValue={1} min={1} required />
       </div>
+      <GameImagePicker />
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
       <button
         type="submit"
@@ -76,5 +80,35 @@ function Field({
         className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:border-fuchsia-500"
       />
     </label>
+  );
+}
+
+export function GamePhotoForm({
+  gameId,
+  initial,
+}: {
+  gameId: string;
+  initial?: string;
+}) {
+  const [state, action, pending] = useActionState<ImageFormState, FormData>(
+    setGameImageAction,
+    undefined,
+  );
+  return (
+    <form action={action} className="space-y-2">
+      <input type="hidden" name="gameId" value={gameId} />
+      <GameImagePicker initial={initial} label="Game photo" />
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={pending}
+          className="px-3 py-1.5 text-sm rounded-md bg-fuchsia-500 text-black font-semibold hover:bg-fuchsia-300 disabled:opacity-50"
+        >
+          {pending ? "Saving…" : "Save photo"}
+        </button>
+        {state?.error && <span className="text-xs text-red-400">{state.error}</span>}
+        {state?.ok && <span className="text-xs text-fuchsia-300">Saved.</span>}
+      </div>
+    </form>
   );
 }

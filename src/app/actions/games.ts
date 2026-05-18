@@ -16,6 +16,7 @@ import {
   listSignupsForGame,
   listUsers,
   setSignupTeam,
+  updateGameImage,
   updateTeamRequestStatus,
   updateUser,
 } from "@/lib/repo";
@@ -37,6 +38,17 @@ async function requireAdminSession() {
 
 // ─── Games (admin) ───────────────────────────────────────────────────────────
 
+const MAX_IMAGE_LEN = 1_500_000; // ~1.5 MB; Cosmos doc limit is 2 MB.
+
+const imageUrlSchema = z
+  .string()
+  .max(MAX_IMAGE_LEN, "Image too large (please use a smaller photo)")
+  .refine(
+    (s) => s.startsWith("data:image/") || /^https?:\/\//i.test(s),
+    "Must be an uploaded image or http(s) URL",
+  )
+  .optional();
+
 const gameSchema = z
   .object({
     title: z.string().min(2).max(120).trim(),
@@ -45,6 +57,7 @@ const gameSchema = z
     scheduledFor: z.string().trim().optional(),
     minTeamSize: z.coerce.number().int().min(1).max(50),
     maxTeamSize: z.coerce.number().int().min(1).max(50),
+    imageUrl: imageUrlSchema,
   })
   .refine((v) => v.maxTeamSize >= v.minTeamSize, {
     message: "maxTeamSize must be >= minTeamSize",
@@ -65,6 +78,7 @@ export async function createGameAction(
     scheduledFor: formData.get("scheduledFor") || undefined,
     minTeamSize: formData.get("minTeamSize"),
     maxTeamSize: formData.get("maxTeamSize"),
+    imageUrl: formData.get("imageUrl") || undefined,
   });
   if (!parsed.success) {
     return {
@@ -98,6 +112,28 @@ export async function deleteGameAction(gameId: string) {
   await deleteGame(gameId);
   revalidatePath("/games");
   revalidatePath("/admin/games");
+}
+
+export type ImageFormState = { error?: string; ok?: boolean } | undefined;
+
+export async function setGameImageAction(
+  _prev: ImageFormState,
+  formData: FormData,
+): Promise<ImageFormState> {
+  await requireAdminSession();
+  const gameId = String(formData.get("gameId") ?? "");
+  if (!gameId) return { error: "Missing gameId" };
+  const raw = formData.get("imageUrl");
+  const value = raw ? String(raw) : undefined;
+  const parsed = imageUrlSchema.safeParse(value);
+  if (!parsed.success) {
+    return { error: parsed.error.issues.map((i) => i.message).join("; ") };
+  }
+  await updateGameImage(gameId, parsed.data);
+  revalidatePath("/games");
+  revalidatePath(`/games/${gameId}`);
+  revalidatePath("/admin/games");
+  return { ok: true };
 }
 
 // ─── Signups (everyone) ──────────────────────────────────────────────────────

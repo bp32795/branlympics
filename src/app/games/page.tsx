@@ -50,6 +50,16 @@ export default async function GamesPage() {
             className="border border-zinc-800 rounded-lg p-4 hover:border-fuchsia-500/50 transition-colors"
           >
             <div className="flex items-start justify-between gap-4">
+              {g.imageUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <Link href={`/games/${g.id}`} className="shrink-0">
+                  <img
+                    src={g.imageUrl}
+                    alt=""
+                    className="h-20 w-20 sm:h-24 sm:w-24 rounded-md object-cover border border-fuchsia-500/30 shadow-[0_0_18px_rgba(255,43,214,0.15)]"
+                  />
+                </Link>
+              )}
               <div className="flex-1">
                 <Link
                   href={`/games/${g.id}`}

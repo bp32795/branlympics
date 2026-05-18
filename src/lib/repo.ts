@@ -117,6 +117,18 @@ export async function createGame(
   return game;
 }
 
+export async function updateGameImage(
+  id: string,
+  imageUrl: string | undefined,
+): Promise<Game | null> {
+  const c = await getContainer("games");
+  const existing = await getGame(id);
+  if (!existing) return null;
+  const updated: Game = { ...existing, imageUrl: imageUrl || undefined };
+  await c.item(id, id).replace(updated);
+  return updated;
+}
+
 export async function deleteGame(id: string): Promise<void> {
   const games = await getContainer("games");
   const signups = await getContainer("signups");

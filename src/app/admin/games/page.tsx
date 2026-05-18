@@ -4,6 +4,7 @@ import { listGames } from "@/lib/repo";
 import {
   AddGameForm,
   DeleteGameButton,
+  GamePhotoForm,
 } from "@/components/admin-game-forms";
 
 export const dynamic = "force-dynamic";
@@ -32,14 +33,29 @@ export default async function AdminGamesPage() {
             {games.map((g) => (
               <li
                 key={g.id}
-                className="px-3 py-2 flex items-center justify-between text-sm"
+                className="px-3 py-3 flex flex-col gap-3 text-sm sm:flex-row sm:items-start sm:justify-between"
               >
-                <Link
-                  href={`/games/${g.id}`}
-                  className="hover:text-fuchsia-300"
-                >
-                  {g.title}
-                </Link>
+                <div className="flex items-start gap-3 flex-1">
+                  {g.imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={g.imageUrl}
+                      alt=""
+                      className="h-12 w-12 rounded object-cover border border-fuchsia-500/30"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <Link
+                      href={`/games/${g.id}`}
+                      className="hover:text-fuchsia-300 font-medium"
+                    >
+                      {g.title}
+                    </Link>
+                    <div className="mt-2">
+                      <GamePhotoForm gameId={g.id} initial={g.imageUrl} />
+                    </div>
+                  </div>
+                </div>
                 <DeleteGameButton gameId={g.id} />
               </li>
             ))}

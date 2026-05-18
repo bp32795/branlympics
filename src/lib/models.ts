@@ -24,6 +24,8 @@ export interface Game {
   /** Inclusive. 1 = solo allowed. */
   minTeamSize: number;
   maxTeamSize: number;
+  /** Data URL or http(s) URL for the game photo. */
+  imageUrl?: string;
   createdBy: string;
   createdAt: string;
 }
