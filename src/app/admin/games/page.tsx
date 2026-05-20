@@ -4,7 +4,7 @@ import { listGames } from "@/lib/repo";
 import {
   AddGameForm,
   DeleteGameButton,
-  GamePhotoForm,
+  EditGameForm,
 } from "@/components/admin-game-forms";
 
 export const dynamic = "force-dynamic";
@@ -52,7 +52,7 @@ export default async function AdminGamesPage() {
                       {g.title}
                     </Link>
                     <div className="mt-2">
-                      <GamePhotoForm gameId={g.id} initial={g.imageUrl} />
+                      <EditGameForm game={g} />
                     </div>
                   </div>
                 </div>

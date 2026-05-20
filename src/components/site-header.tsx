@@ -13,6 +13,7 @@ export async function SiteHeader() {
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/games" className="hover:text-fuchsia-300">Games</Link>
+          <Link href="/location" className="hover:text-fuchsia-300">Location</Link>
           {user && (
             <Link href="/account" className="hover:text-fuchsia-300">My signups</Link>
           )}

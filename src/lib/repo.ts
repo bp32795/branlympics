@@ -117,6 +117,22 @@ export async function createGame(
   return game;
 }
 
+export async function updateGame(
+  id: string,
+  patch: Partial<Omit<Game, "id" | "createdAt" | "createdBy">>,
+): Promise<Game | null> {
+  const c = await getContainer("games");
+  const existing = await getGame(id);
+  if (!existing) return null;
+  const updated: Game = { ...existing, ...patch };
+  // Strip undefined optional fields so they're removed from the doc.
+  if (patch.location === undefined && "location" in patch) delete updated.location;
+  if (patch.scheduledFor === undefined && "scheduledFor" in patch) delete updated.scheduledFor;
+  if (patch.imageUrl === undefined && "imageUrl" in patch) delete updated.imageUrl;
+  await c.item(id, id).replace(updated);
+  return updated;
+}
+
 export async function updateGameImage(
   id: string,
   imageUrl: string | undefined,

@@ -16,6 +16,7 @@ import {
   listSignupsForGame,
   listUsers,
   setSignupTeam,
+  updateGame,
   updateGameImage,
   updateTeamRequestStatus,
   updateUser,
@@ -105,6 +106,47 @@ export async function createGameAction(
   revalidatePath("/games");
   revalidatePath("/admin/games");
   return undefined;
+}
+
+export type UpdateGameFormState =
+  | { error?: string; ok?: boolean }
+  | undefined;
+
+export async function updateGameAction(
+  _prev: UpdateGameFormState,
+  formData: FormData,
+): Promise<UpdateGameFormState> {
+  await requireAdminSession();
+  const gameId = String(formData.get("gameId") ?? "");
+  if (!gameId) return { error: "Missing gameId" };
+  const existing = await getGame(gameId);
+  if (!existing) return { error: "Game not found" };
+
+  const parsed = gameSchema.safeParse({
+    title: formData.get("title"),
+    description: formData.get("description"),
+    location: formData.get("location") || undefined,
+    scheduledFor: formData.get("scheduledFor") || undefined,
+    minTeamSize: formData.get("minTeamSize"),
+    maxTeamSize: formData.get("maxTeamSize"),
+    imageUrl: formData.get("imageUrl") || undefined,
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues.map((i) => i.message).join("; ") };
+  }
+  await updateGame(gameId, {
+    title: parsed.data.title,
+    description: parsed.data.description,
+    location: parsed.data.location,
+    scheduledFor: parsed.data.scheduledFor,
+    minTeamSize: parsed.data.minTeamSize,
+    maxTeamSize: parsed.data.maxTeamSize,
+    imageUrl: parsed.data.imageUrl,
+  });
+  revalidatePath("/games");
+  revalidatePath(`/games/${gameId}`);
+  revalidatePath("/admin/games");
+  return { ok: true };
 }
 
 export async function deleteGameAction(gameId: string) {
