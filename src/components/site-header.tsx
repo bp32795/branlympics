@@ -15,6 +15,9 @@ export async function SiteHeader() {
           <Link href="/games" className="hover:text-fuchsia-300">Games</Link>
           <Link href="/location" className="hover:text-fuchsia-300">Location</Link>
           {user && (
+            <Link href="/games/suggest" className="hover:text-fuchsia-300">Suggest</Link>
+          )}
+          {user && (
             <Link href="/account" className="hover:text-fuchsia-300">My signups</Link>
           )}
           {user?.isAdmin && (

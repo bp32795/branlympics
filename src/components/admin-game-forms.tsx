@@ -31,12 +31,6 @@ export function AddGameForm() {
           className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:border-fuchsia-500"
         />
       </label>
-      <Field label="Location (optional)" name="location" />
-      <Field
-        label="When (optional)"
-        name="scheduledFor"
-        type="datetime-local"
-      />
       <div className="grid grid-cols-2 gap-3">
         <Field label="Min team size" name="minTeamSize" type="number" defaultValue={1} min={1} required />
         <Field label="Max team size" name="maxTeamSize" type="number" defaultValue={1} min={1} required />
@@ -116,15 +110,6 @@ export function GamePhotoForm({
   );
 }
 
-/** Format an ISO datetime string for a <input type="datetime-local">. */
-function toDatetimeLocal(iso?: string): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
 export function EditGameForm({ game }: { game: Game }) {
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState<UpdateGameFormState, FormData>(
@@ -159,17 +144,6 @@ export function EditGameForm({ game }: { game: Game }) {
           className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:border-fuchsia-500"
         />
       </label>
-      <Field
-        label="Location (optional)"
-        name="location"
-        defaultValue={game.location ?? ""}
-      />
-      <Field
-        label="When (optional)"
-        name="scheduledFor"
-        type="datetime-local"
-        defaultValue={toDatetimeLocal(game.scheduledFor)}
-      />
       <div className="grid grid-cols-2 gap-3">
         <Field
           label="Min team size"

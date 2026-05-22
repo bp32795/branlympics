@@ -5,11 +5,14 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import {
   createGame,
+  createGameSuggestion,
   createSignup,
   createTeamRequest,
   deleteGame,
+  deleteGameSuggestion,
   deleteSignup,
   getGame,
+  getGameSuggestion,
   getSignup,
   getTeamRequest,
   getUserById,
@@ -18,10 +21,16 @@ import {
   setSignupTeam,
   updateGame,
   updateGameImage,
+  updateGameSuggestion,
   updateTeamRequestStatus,
   updateUser,
 } from "@/lib/repo";
-import { newGameEmail, sendEmail, teamRequestEmail } from "@/lib/email";
+import {
+  gameSuggestionEmail,
+  newGameEmail,
+  sendEmail,
+  teamRequestEmail,
+} from "@/lib/email";
 import { env } from "@/lib/env";
 import { randomUUID } from "crypto";
 
@@ -283,3 +292,131 @@ export async function setUserAdminAction(userId: string, isAdmin: boolean) {
 
 // Re-export for tests.
 export { listSignupsForGame };
+
+// ─── Game suggestions ────────────────────────────────────────────────────────
+
+const SUGGESTION_NOTIFY_EMAIL = "bp32795@gmail.com";
+
+const suggestionSchema = z
+  .object({
+    title: z.string().min(2).max(120).trim(),
+    description: z.string().min(1).max(2000).trim(),
+    minTeamSize: z.coerce.number().int().min(1).max(50),
+    maxTeamSize: z.coerce.number().int().min(1).max(50),
+    note: z.string().max(1000).trim().optional(),
+    imageUrl: imageUrlSchema,
+  })
+  .refine((v) => v.maxTeamSize >= v.minTeamSize, {
+    message: "maxTeamSize must be >= minTeamSize",
+    path: ["maxTeamSize"],
+  });
+
+export type SuggestionFormState =
+  | { error?: string; ok?: boolean }
+  | undefined;
+
+export async function createGameSuggestionAction(
+  _prev: SuggestionFormState,
+  formData: FormData,
+): Promise<SuggestionFormState> {
+  const user = await requireSession();
+  const parsed = suggestionSchema.safeParse({
+    title: formData.get("title"),
+    description: formData.get("description"),
+    minTeamSize: formData.get("minTeamSize"),
+    maxTeamSize: formData.get("maxTeamSize"),
+    note: formData.get("note") || undefined,
+    imageUrl: formData.get("imageUrl") || undefined,
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues.map((i) => i.message).join("; ") };
+  }
+  const submitter = await getUserById(user.id);
+  const suggestion = await createGameSuggestion({
+    title: parsed.data.title,
+    description: parsed.data.description,
+    minTeamSize: parsed.data.minTeamSize,
+    maxTeamSize: parsed.data.maxTeamSize,
+    imageUrl: parsed.data.imageUrl,
+    note: parsed.data.note,
+    submittedBy: user.id,
+    submitterName: submitter?.name ?? user.name ?? "Someone",
+    submitterEmail: submitter?.email ?? user.email ?? "",
+  });
+
+  const { subject, html } = gameSuggestionEmail({
+    fromName: suggestion.submitterName,
+    fromEmail: suggestion.submitterEmail,
+    title: suggestion.title,
+    description: suggestion.description,
+    minTeamSize: suggestion.minTeamSize,
+    maxTeamSize: suggestion.maxTeamSize,
+    note: suggestion.note,
+    reviewUrl: `${env.appUrl}/admin/suggestions`,
+  });
+  await sendEmail({ to: SUGGESTION_NOTIFY_EMAIL, subject, html });
+
+  revalidatePath("/admin/suggestions");
+  revalidatePath("/games/suggest");
+  return { ok: true };
+}
+
+export async function approveGameSuggestionAction(suggestionId: string) {
+  const admin = await requireAdminSession();
+  const s = await getGameSuggestion(suggestionId);
+  if (!s) throw new Error("Suggestion not found");
+  if (s.status !== "pending") throw new Error("Already reviewed");
+
+  const game = await createGame({
+    title: s.title,
+    description: s.description,
+    minTeamSize: s.minTeamSize,
+    maxTeamSize: s.maxTeamSize,
+    imageUrl: s.imageUrl,
+    createdBy: admin.id,
+  });
+
+  await updateGameSuggestion({
+    ...s,
+    status: "approved",
+    reviewedAt: new Date().toISOString(),
+    reviewedBy: admin.id,
+    approvedGameId: game.id,
+  });
+
+  // Notify everyone about the new game (same as createGameAction).
+  const users = await listUsers();
+  const recipients = users.map((u) => u.email).filter(Boolean);
+  if (recipients.length) {
+    const { subject, html } = newGameEmail({
+      gameTitle: game.title,
+      gameDescription: game.description,
+      gameUrl: `${env.appUrl}/games/${game.id}`,
+    });
+    await sendEmail({ to: recipients, subject, html });
+  }
+
+  revalidatePath("/admin/suggestions");
+  revalidatePath("/admin/games");
+  revalidatePath("/games");
+}
+
+export async function rejectGameSuggestionAction(suggestionId: string) {
+  const admin = await requireAdminSession();
+  const s = await getGameSuggestion(suggestionId);
+  if (!s) throw new Error("Suggestion not found");
+  if (s.status !== "pending") throw new Error("Already reviewed");
+  await updateGameSuggestion({
+    ...s,
+    status: "rejected",
+    reviewedAt: new Date().toISOString(),
+    reviewedBy: admin.id,
+  });
+  revalidatePath("/admin/suggestions");
+}
+
+export async function deleteGameSuggestionAction(suggestionId: string) {
+  await requireAdminSession();
+  await deleteGameSuggestion(suggestionId);
+  revalidatePath("/admin/suggestions");
+}

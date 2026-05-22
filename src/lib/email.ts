@@ -69,3 +69,32 @@ export function teamRequestEmail(opts: {
     `,
   };
 }
+
+export function gameSuggestionEmail(opts: {
+  fromName: string;
+  fromEmail: string;
+  title: string;
+  description: string;
+  minTeamSize: number;
+  maxTeamSize: number;
+  note?: string;
+  reviewUrl: string;
+}) {
+  const teamSize =
+    opts.minTeamSize === opts.maxTeamSize
+      ? `${opts.minTeamSize} per team`
+      : `${opts.minTeamSize}–${opts.maxTeamSize} per team`;
+  return {
+    subject: `New Branlympics game suggestion: ${opts.title}`,
+    html: `
+      <h2>New game suggestion 💡</h2>
+      <p>From <strong>${escapeHtml(opts.fromName)}</strong>
+      (${escapeHtml(opts.fromEmail)})</p>
+      <h3>${escapeHtml(opts.title)}</h3>
+      <p>${escapeHtml(opts.description)}</p>
+      <p><em>Team size:</em> ${escapeHtml(teamSize)}</p>
+      ${opts.note ? `<p><em>Note:</em> ${escapeHtml(opts.note)}</p>` : ""}
+      <p><a href="${opts.reviewUrl}">Review in admin →</a></p>
+    `,
+  };
+}

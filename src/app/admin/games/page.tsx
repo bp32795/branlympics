@@ -16,12 +16,20 @@ export default async function AdminGamesPage() {
     <div className="space-y-6">
       <div className="flex items-baseline justify-between">
         <h1 className="text-3xl font-bold">Admin · Games</h1>
-        <Link
-          href="/admin/users"
-          className="text-sm text-fuchsia-300 hover:underline"
-        >
-          Manage users →
-        </Link>
+        <div className="flex gap-4 text-sm">
+          <Link
+            href="/admin/suggestions"
+            className="text-fuchsia-300 hover:underline"
+          >
+            Review suggestions →
+          </Link>
+          <Link
+            href="/admin/users"
+            className="text-fuchsia-300 hover:underline"
+          >
+            Manage users →
+          </Link>
+        </div>
       </div>
       <AddGameForm />
       <section className="space-y-2">

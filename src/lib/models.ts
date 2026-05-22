@@ -50,3 +50,25 @@ export interface TeamRequest {
   createdAt: string;
   respondedAt?: string;
 }
+
+export type GameSuggestionStatus = "pending" | "approved" | "rejected";
+
+export interface GameSuggestion {
+  id: string;
+  title: string;
+  description: string;
+  minTeamSize: number;
+  maxTeamSize: number;
+  imageUrl?: string;
+  /** Optional note from the submitter to admins. */
+  note?: string;
+  submittedBy: string;
+  submitterName: string;
+  submitterEmail: string;
+  status: GameSuggestionStatus;
+  createdAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  /** If approved, the resulting Game id. */
+  approvedGameId?: string;
+}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listGames, listSignupsForUser } from "@/lib/repo";
+import { listGames, listSignupsForGame, listSignupsForUser } from "@/lib/repo";
 import { requireUser } from "@/app/actions/auth";
 import { SignupToggleButton } from "@/components/signup-toggle-button";
 import { BulkSignupPanel } from "@/components/bulk-signup-panel";
@@ -14,19 +14,35 @@ export default async function GamesPage() {
     listSignupsForUser(userId),
   ]);
   const signedUp = new Set(mySignups.map((s) => s.gameId));
+  const signupCounts = new Map<string, number>(
+    await Promise.all(
+      games.map(
+        async (g) =>
+          [g.id, (await listSignupsForGame(g.id)).length] as [string, number],
+      ),
+    ),
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex items-baseline justify-between">
         <h1 className="text-3xl font-bold">Games</h1>
-        {me.isAdmin && (
+        <div className="flex items-center gap-4 text-sm">
           <Link
-            href="/admin/games"
-            className="text-sm text-fuchsia-300 hover:underline"
+            href="/games/suggest"
+            className="text-fuchsia-300 hover:underline"
           >
-            + Add a game
+            💡 Suggest a game
           </Link>
-        )}
+          {me.isAdmin && (
+            <Link
+              href="/admin/games"
+              className="text-fuchsia-300 hover:underline"
+            >
+              + Add a game
+            </Link>
+          )}
+        </div>
       </div>
 
       {games.length === 0 && (
@@ -79,6 +95,9 @@ export default async function GamesPage() {
                     👥 {g.minTeamSize === g.maxTeamSize
                       ? `${g.minTeamSize} per team`
                       : `${g.minTeamSize}–${g.maxTeamSize} per team`}
+                  </span>
+                  <span>
+                    🙋 {signupCounts.get(g.id) ?? 0} signed up
                   </span>
                 </div>
               </div>

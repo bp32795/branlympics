@@ -2,6 +2,8 @@ import "server-only";
 import { getContainer } from "./db";
 import type {
   Game,
+  GameSuggestion,
+  GameSuggestionStatus,
   Signup,
   TeamRequest,
   TeamRequestStatus,
@@ -323,4 +325,65 @@ export async function updateTeamRequestStatus(
   };
   const { resource } = await c.item(req.id, req.toUserId).replace(updated);
   return resource as TeamRequest;
+}
+
+// ─── Game suggestions ────────────────────────────────────────────────────────
+
+export async function createGameSuggestion(
+  input: Omit<GameSuggestion, "id" | "createdAt" | "status">,
+): Promise<GameSuggestion> {
+  const c = await getContainer("gameSuggestions");
+  const s: GameSuggestion = {
+    ...input,
+    id: randomUUID(),
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  };
+  await c.items.create(s);
+  return s;
+}
+
+export async function listGameSuggestions(
+  status?: GameSuggestionStatus,
+): Promise<GameSuggestion[]> {
+  const c = await getContainer("gameSuggestions");
+  const { resources } = await c.items
+    .query<GameSuggestion>(
+      status
+        ? {
+            query: "SELECT * FROM c WHERE c.status = @s",
+            parameters: [{ name: "@s", value: status }],
+          }
+        : "SELECT * FROM c",
+    )
+    .fetchAll();
+  return [...resources].sort((a, b) =>
+    a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0,
+  );
+}
+
+export async function getGameSuggestion(
+  id: string,
+): Promise<GameSuggestion | null> {
+  const c = await getContainer("gameSuggestions");
+  try {
+    const { resource } = await c.item(id, id).read<GameSuggestion>();
+    return resource ?? null;
+  } catch (e) {
+    if ((e as { code?: number }).code === 404) return null;
+    throw e;
+  }
+}
+
+export async function updateGameSuggestion(
+  s: GameSuggestion,
+): Promise<GameSuggestion> {
+  const c = await getContainer("gameSuggestions");
+  const { resource } = await c.item(s.id, s.id).replace(s);
+  return resource as GameSuggestion;
+}
+
+export async function deleteGameSuggestion(id: string): Promise<void> {
+  const c = await getContainer("gameSuggestions");
+  await c.item(id, id).delete();
 }

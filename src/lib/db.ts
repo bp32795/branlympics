@@ -2,13 +2,14 @@ import "server-only";
 import { CosmosClient, Container, Database } from "@azure/cosmos";
 import { env } from "./env";
 
-type ContainerKey = "users" | "games" | "signups" | "teamRequests";
+type ContainerKey = "users" | "games" | "signups" | "teamRequests" | "gameSuggestions";
 
 const PARTITION_KEYS: Record<ContainerKey, string> = {
   users: "/id",
   games: "/id",
   signups: "/gameId",
   teamRequests: "/toUserId",
+  gameSuggestions: "/id",
 };
 
 let _client: CosmosClient | null = null;
