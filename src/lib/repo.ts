@@ -80,6 +80,47 @@ export async function updateUser(user: User): Promise<User> {
   return resource as User;
 }
 
+export async function deleteUser(userId: string): Promise<void> {
+  const users = await getContainer("users");
+  const signups = await getContainer("signups");
+  const teamRequests = await getContainer("teamRequests");
+
+  // Signups by this user (partitioned by gameId, so query then delete by gameId pk).
+  const { resources: userSignups } = await signups.items
+    .query<Signup>({
+      query: "SELECT * FROM c WHERE c.userId = @u",
+      parameters: [{ name: "@u", value: userId }],
+    })
+    .fetchAll();
+  await Promise.all(
+    userSignups.map((s) => signups.item(s.id, s.gameId).delete()),
+  );
+
+  // Team requests where this user is the recipient (partition = toUserId).
+  const { resources: incoming } = await teamRequests.items
+    .query<TeamRequest>({
+      query: "SELECT * FROM c WHERE c.toUserId = @u",
+      parameters: [{ name: "@u", value: userId }],
+    })
+    .fetchAll();
+  await Promise.all(
+    incoming.map((r) => teamRequests.item(r.id, r.toUserId).delete()),
+  );
+
+  // Team requests where this user is the sender (cross-partition query).
+  const { resources: outgoing } = await teamRequests.items
+    .query<TeamRequest>({
+      query: "SELECT * FROM c WHERE c.fromUserId = @u",
+      parameters: [{ name: "@u", value: userId }],
+    })
+    .fetchAll();
+  await Promise.all(
+    outgoing.map((r) => teamRequests.item(r.id, r.toUserId).delete()),
+  );
+
+  await users.item(userId, userId).delete();
+}
+
 // ─── Games ───────────────────────────────────────────────────────────────────
 
 export async function listGames(): Promise<Game[]> {

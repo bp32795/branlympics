@@ -11,6 +11,7 @@ import {
   deleteGame,
   deleteGameSuggestion,
   deleteSignup,
+  deleteUser,
   getGame,
   getGameSuggestion,
   getSignup,
@@ -288,6 +289,16 @@ export async function setUserAdminAction(userId: string, isAdmin: boolean) {
   if (!u) throw new Error("User not found");
   await updateUser({ ...u, isAdmin });
   revalidatePath("/admin/users");
+}
+
+export async function deleteUserAction(userId: string) {
+  const admin = await requireAdminSession();
+  if (userId === admin.id) throw new Error("You can't delete yourself");
+  const u = await getUserById(userId);
+  if (!u) throw new Error("User not found");
+  await deleteUser(userId);
+  revalidatePath("/admin/users");
+  revalidatePath("/games");
 }
 
 // Re-export for tests.
