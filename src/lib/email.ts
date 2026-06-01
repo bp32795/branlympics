@@ -23,10 +23,48 @@ export async function sendEmail({ to, subject, html }: SendArgs) {
       to,
       subject,
       html,
+      headers: bulkHeaders(),
     });
   } catch (err) {
     console.error("[email] send failed:", err);
   }
+}
+
+// Gmail flags a single message with many To: recipients as a bulk blast and
+// rate-limits the sending domain. Send one personalized message per recipient
+// via Resend's batch endpoint (up to 100 per call) instead.
+export async function sendBulkEmail({
+  to,
+  subject,
+  html,
+}: {
+  to: string[];
+  subject: string;
+  html: string;
+}) {
+  const recipients = Array.from(new Set(to.filter(Boolean)));
+  if (!recipients.length) return;
+  const from = env.emailFrom;
+  const headers = bulkHeaders();
+  const chunkSize = 100;
+  for (let i = 0; i < recipients.length; i += chunkSize) {
+    const chunk = recipients.slice(i, i + chunkSize);
+    try {
+      await client().batch.send(
+        chunk.map((addr) => ({ from, to: addr, subject, html, headers })),
+      );
+    } catch (err) {
+      console.error("[email] bulk send failed:", err);
+    }
+  }
+}
+
+function bulkHeaders(): Record<string, string> {
+  const unsubUrl = `${env.appUrl}/account`;
+  return {
+    "List-Unsubscribe": `<${unsubUrl}>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+  };
 }
 
 function escapeHtml(s: string): string {

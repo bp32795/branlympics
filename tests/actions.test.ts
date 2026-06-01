@@ -22,6 +22,7 @@ beforeEach(() => {
   }));
   vi.doMock("@/lib/email", () => ({
     sendEmail: vi.fn(),
+    sendBulkEmail: vi.fn(),
     newGameEmail: () => ({ subject: "", html: "" }),
     teamRequestEmail: () => ({ subject: "", html: "" }),
   }));
@@ -181,7 +182,7 @@ describe("createGameAction", () => {
     expect(result).toBeUndefined();
     const games = await repo.listGames();
     expect(games.find((g) => g.title === "Wii Bowling")).toBeTruthy();
-    expect(email.sendEmail).toHaveBeenCalled();
+    expect(email.sendBulkEmail).toHaveBeenCalled();
   });
 
   it("rejects max < min team size", async () => {

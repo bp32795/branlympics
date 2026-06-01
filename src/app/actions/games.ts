@@ -30,6 +30,7 @@ import {
   gameSuggestionEmail,
   newGameEmail,
   sendEmail,
+  sendBulkEmail,
   teamRequestEmail,
 } from "@/lib/email";
 import { env } from "@/lib/env";
@@ -110,7 +111,7 @@ export async function createGameAction(
       gameDescription: game.description,
       gameUrl: `${env.appUrl}/games/${game.id}`,
     });
-    await sendEmail({ to: recipients, subject, html });
+    await sendBulkEmail({ to: recipients, subject, html });
   }
 
   revalidatePath("/games");
@@ -404,7 +405,7 @@ export async function approveGameSuggestionAction(suggestionId: string) {
       gameDescription: game.description,
       gameUrl: `${env.appUrl}/games/${game.id}`,
     });
-    await sendEmail({ to: recipients, subject, html });
+    await sendBulkEmail({ to: recipients, subject, html });
   }
 
   revalidatePath("/admin/suggestions");
