@@ -78,3 +78,39 @@ describe("repo: signups", () => {
     expect(await listSignupsForGame(g.id)).toEqual([]);
   });
 });
+
+describe("repo: itinerary ordering", () => {
+  it("persists an admin-defined activity order", async () => {
+    const { createGame, createUser, listGames, reorderGames } = await import(
+      "@/lib/repo"
+    );
+    const admin = await createUser({
+      email: "admin@x.com",
+      name: "Admin",
+      provider: "credentials",
+    });
+    const early = await createGame({
+      title: "Early",
+      description: "First by time",
+      scheduledFor: "2026-08-08T09:00",
+      minTeamSize: 1,
+      maxTeamSize: 1,
+      createdBy: admin.id,
+    });
+    const late = await createGame({
+      title: "Late",
+      description: "Second by time",
+      scheduledFor: "2026-08-08T18:00",
+      minTeamSize: 1,
+      maxTeamSize: 1,
+      createdBy: admin.id,
+    });
+
+    await reorderGames([late.id, early.id]);
+
+    expect((await listGames()).map((game) => game.id)).toEqual([
+      late.id,
+      early.id,
+    ]);
+  });
+});

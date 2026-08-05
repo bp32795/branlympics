@@ -19,6 +19,7 @@ import {
   getUserById,
   listSignupsForGame,
   listUsers,
+  reorderGames,
   setSignupTeam,
   updateGame,
   updateGameImage,
@@ -159,6 +160,17 @@ export async function deleteGameAction(gameId: string) {
   revalidatePath("/iten");
   revalidatePath("/admin");
   revalidatePath("/admin/games");
+}
+
+export async function reorderGamesAction(gameIds: string[]) {
+  await requireAdminSession();
+  const uniqueIds = [...new Set(gameIds)];
+  if (uniqueIds.length !== gameIds.length) {
+    throw new Error("Duplicate activity IDs");
+  }
+  await reorderGames(uniqueIds);
+  revalidatePath("/iten");
+  revalidatePath("/admin");
 }
 
 export type ImageFormState = { error?: string; ok?: boolean } | undefined;

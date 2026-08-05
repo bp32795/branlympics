@@ -204,6 +204,29 @@ describe("createGameAction", () => {
   });
 });
 
+describe("reorderGamesAction", () => {
+  it("allows an admin to persist activity order", async () => {
+    const { admin, game, soloGame, repo } = await seed();
+    setCurrentUser({ ...admin });
+    const { reorderGamesAction } = await import("@/app/actions/games");
+
+    await reorderGamesAction([soloGame.id, game.id]);
+
+    expect((await repo.listGames()).map((activity) => activity.id)).toEqual([
+      soloGame.id,
+      game.id,
+    ]);
+  });
+
+  it("rejects non-admin reordering", async () => {
+    const { alice, game } = await seed();
+    setCurrentUser({ ...alice });
+    const { reorderGamesAction } = await import("@/app/actions/games");
+
+    await expect(reorderGamesAction([game.id])).rejects.toThrow(/admin/);
+  });
+});
+
 describe("setUserAdminAction", () => {
   it("admin can promote another user", async () => {
     const { admin, alice, repo } = await seed();

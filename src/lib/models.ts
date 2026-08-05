@@ -21,6 +21,8 @@ export interface Game {
   location?: string;
   /** ISO datetime — when this game will be played. */
   scheduledFor?: string;
+  /** Admin-defined position in the public itinerary. */
+  itineraryOrder?: number;
   /** Inclusive. 1 = solo allowed. */
   minTeamSize: number;
   maxTeamSize: number;

@@ -130,10 +130,27 @@ export async function listGames(): Promise<Game[]> {
     .fetchAll();
   // Cosmos SQL ORDER BY does not support expressions, so sort in memory.
   return [...resources].sort((a, b) => {
+    if (a.itineraryOrder !== undefined || b.itineraryOrder !== undefined) {
+      const orderA = a.itineraryOrder ?? Number.MAX_SAFE_INTEGER;
+      const orderB = b.itineraryOrder ?? Number.MAX_SAFE_INTEGER;
+      if (orderA !== orderB) return orderA - orderB;
+    }
     const ka = a.scheduledFor ?? a.createdAt;
     const kb = b.scheduledFor ?? b.createdAt;
     return ka < kb ? -1 : ka > kb ? 1 : 0;
   });
+}
+
+export async function reorderGames(gameIds: string[]): Promise<void> {
+  const c = await getContainer("games");
+  const games = await Promise.all(gameIds.map((id) => getGame(id)));
+  if (games.some((game) => !game)) throw new Error("Activity not found");
+
+  await Promise.all(
+    games.map((game, itineraryOrder) =>
+      c.item(game!.id, game!.id).replace({ ...game!, itineraryOrder }),
+    ),
+  );
 }
 
 export async function getGame(id: string): Promise<Game | null> {

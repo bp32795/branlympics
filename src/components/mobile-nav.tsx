@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { signOutAction } from "@/app/actions/auth";
 
 export interface NavItem {
   href: string;
   label: string;
 }
+
+const subscribeToClient = () => () => {};
 
 export function MobileNav({
   items,
@@ -19,6 +22,11 @@ export function MobileNav({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const mounted = useSyncExternalStore(
+    subscribeToClient,
+    () => true,
+    () => false,
+  );
 
   // Lock body scroll while drawer is open.
   useEffect(() => {
@@ -66,7 +74,8 @@ export function MobileNav({
         </svg>
       </button>
 
-      <div className="sm:hidden">
+      {mounted && createPortal(
+        <div className="sm:hidden">
             {/* Backdrop */}
             <div
               onClick={() => setOpen(false)}
@@ -81,10 +90,10 @@ export function MobileNav({
               role="dialog"
               aria-modal="true"
               aria-label="Site navigation"
-              className={`fixed top-0 left-0 z-[70] h-full w-72 max-w-[85vw] bg-[#0a0014] border-r border-fuchsia-500/40 shadow-[0_0_40px_rgba(176,38,255,0.35)] transform transition-transform duration-200 ease-out ${
+              className={`fixed top-0 left-0 z-[70] isolate h-full w-72 max-w-[85vw] border-r border-fuchsia-500/40 bg-[#0a0014] shadow-[0_0_40px_rgba(176,38,255,0.35)] transform transition-transform duration-200 ease-out ${
                 open ? "translate-x-0" : "-translate-x-full"
               }`}
-              style={{ backgroundColor: "#0a0014" }}
+              style={{ background: "#0a0014", opacity: 1 }}
             >
               <div className="h-14 px-4 flex items-center justify-between border-b border-fuchsia-500/20">
                 <span className="neon-title font-bold tracking-widest text-sm">
@@ -146,7 +155,9 @@ export function MobileNav({
                 )}
               </nav>
             </aside>
-      </div>
+        </div>,
+        document.body,
+      )}
     </>
   );
 }
