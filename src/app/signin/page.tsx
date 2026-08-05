@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
 import {
   signInWithCredentials,
   signInWithProvider,
@@ -15,7 +14,12 @@ export default function SignInPage() {
   );
   return (
     <div className="max-w-sm mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">Sign in</h1>
+      <div>
+        <h1 className="text-2xl font-bold">Admin sign in</h1>
+        <p className="mt-2 text-sm text-zinc-400">
+          Sign in to manage the Saturday itinerary.
+        </p>
+      </div>
 
       <div className="space-y-2">
         <ProviderButton provider="google" label="Continue with Google" />
@@ -42,13 +46,6 @@ export default function SignInPage() {
           {pending ? "Signing in…" : "Sign in"}
         </button>
       </form>
-
-      <p className="text-sm text-zinc-400 text-center">
-        No account?{" "}
-        <Link href="/signup" className="text-fuchsia-300 hover:underline">
-          Sign up
-        </Link>
-      </p>
     </div>
   );
 }

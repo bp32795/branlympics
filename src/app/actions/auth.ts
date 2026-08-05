@@ -47,7 +47,7 @@ export async function signUpWithCredentials(
     provider: "credentials",
     passwordHash,
   });
-  await signIn("credentials", { email, password, redirectTo: "/games" });
+  await signIn("credentials", { email, password, redirectTo: "/admin" });
   return undefined;
 }
 
@@ -69,7 +69,7 @@ export async function signInWithCredentials(
     await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
-      redirectTo: "/games",
+      redirectTo: "/admin",
     });
   } catch (err) {
     // next-auth throws a redirect — re-throw so Next can handle it.
@@ -82,7 +82,7 @@ export async function signInWithCredentials(
 }
 
 export async function signInWithProvider(provider: "google" | "microsoft-entra-id") {
-  await signIn(provider, { redirectTo: "/games" });
+  await signIn(provider, { redirectTo: "/admin" });
 }
 
 export async function signOutAction() {
@@ -97,7 +97,7 @@ export async function requireUser() {
 
 export async function requireAdmin() {
   const user = await requireUser();
-  if (!user.isAdmin) redirect("/games");
+  if (!user.isAdmin) redirect("/");
   return user;
 }
 

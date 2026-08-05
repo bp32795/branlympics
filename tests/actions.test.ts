@@ -168,7 +168,7 @@ describe("createGameAction", () => {
     await expect(createGameAction(undefined, fd)).rejects.toThrow(/admin/);
   });
 
-  it("admin can create a game and it notifies users", async () => {
+  it("admin can create a scheduled itinerary activity", async () => {
     const { admin, repo } = await seed();
     setCurrentUser({ ...admin });
     const email = await import("@/lib/email");
@@ -176,13 +176,18 @@ describe("createGameAction", () => {
     const fd = new FormData();
     fd.set("title", "Wii Bowling");
     fd.set("description", "Strike");
+    fd.set("location", "Airbnb");
+    fd.set("scheduledFor", "2026-08-08T14:30");
     fd.set("minTeamSize", "1");
     fd.set("maxTeamSize", "4");
     const result = await createGameAction(undefined, fd);
     expect(result).toBeUndefined();
     const games = await repo.listGames();
-    expect(games.find((g) => g.title === "Wii Bowling")).toBeTruthy();
-    expect(email.sendBulkEmail).toHaveBeenCalled();
+    expect(games.find((g) => g.title === "Wii Bowling")).toMatchObject({
+      location: "Airbnb",
+      scheduledFor: "2026-08-08T14:30",
+    });
+    expect(email.sendBulkEmail).not.toHaveBeenCalled();
   });
 
   it("rejects max < min team size", async () => {

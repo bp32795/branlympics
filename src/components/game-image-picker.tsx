@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 interface Props {
   /** Hidden input name posted with the parent form. */
@@ -31,10 +31,6 @@ export function GameImagePicker({
   const [error, setError] = useState<string | undefined>();
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    setDataUrl(initial);
-  }, [initial]);
 
   async function handleFile(file: File) {
     setError(undefined);

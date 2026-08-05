@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import { signOutAction } from "@/app/actions/auth";
 
 export interface NavItem {
@@ -19,17 +18,7 @@ export function MobileNav({
   isSignedIn: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Close drawer on route change.
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
 
   // Lock body scroll while drawer is open.
   useEffect(() => {
@@ -77,9 +66,7 @@ export function MobileNav({
         </svg>
       </button>
 
-      {mounted &&
-        createPortal(
-          <div className="sm:hidden">
+      <div className="sm:hidden">
             {/* Backdrop */}
             <div
               onClick={() => setOpen(false)}
@@ -134,6 +121,7 @@ export function MobileNav({
                     <Link
                       key={item.href}
                       href={item.href}
+                      onClick={() => setOpen(false)}
                       className={`px-3 py-3 rounded-md text-base ${
                         active
                           ? "text-fuchsia-200 bg-fuchsia-500/10"
@@ -144,8 +132,8 @@ export function MobileNav({
                     </Link>
                   );
                 })}
-                <div className="mt-2 pt-2 border-t border-zinc-800">
-                  {isSignedIn ? (
+                {isSignedIn && (
+                  <div className="mt-2 pt-2 border-t border-zinc-800">
                     <form action={signOutAction}>
                       <button
                         type="submit"
@@ -154,20 +142,11 @@ export function MobileNav({
                         Sign out
                       </button>
                     </form>
-                  ) : (
-                    <Link
-                      href="/signin"
-                      className="block px-3 py-3 rounded-md text-base text-zinc-200 hover:text-fuchsia-200 hover:bg-fuchsia-500/10"
-                    >
-                      Sign in
-                    </Link>
-                  )}
-                </div>
+                  </div>
+                )}
               </nav>
             </aside>
-          </div>,
-          document.body,
-        )}
+      </div>
     </>
   );
 }

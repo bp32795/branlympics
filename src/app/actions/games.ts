@@ -97,24 +97,14 @@ export async function createGameAction(
       error: parsed.error.issues.map((i) => i.message).join("; "),
     };
   }
-  const game = await createGame({
+  await createGame({
     ...parsed.data,
     createdBy: admin.id,
   });
 
-  // Notify all users about the new game.
-  const users = await listUsers();
-  const recipients = users.map((u) => u.email).filter(Boolean);
-  if (recipients.length) {
-    const { subject, html } = newGameEmail({
-      gameTitle: game.title,
-      gameDescription: game.description,
-      gameUrl: `${env.appUrl}/games/${game.id}`,
-    });
-    await sendBulkEmail({ to: recipients, subject, html });
-  }
-
   revalidatePath("/games");
+  revalidatePath("/iten");
+  revalidatePath("/admin");
   revalidatePath("/admin/games");
   return undefined;
 }
@@ -155,6 +145,8 @@ export async function updateGameAction(
     imageUrl: parsed.data.imageUrl,
   });
   revalidatePath("/games");
+  revalidatePath("/iten");
+  revalidatePath("/admin");
   revalidatePath(`/games/${gameId}`);
   revalidatePath("/admin/games");
   return { ok: true };
@@ -164,6 +156,8 @@ export async function deleteGameAction(gameId: string) {
   await requireAdminSession();
   await deleteGame(gameId);
   revalidatePath("/games");
+  revalidatePath("/iten");
+  revalidatePath("/admin");
   revalidatePath("/admin/games");
 }
 

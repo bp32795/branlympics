@@ -8,15 +8,13 @@ export async function SiteHeader() {
   const user = session?.user;
 
   const items: NavItem[] = [
-    { href: "/games", label: "Games" },
-    { href: "/location", label: "Location" },
+    { href: "/", label: "Home" },
+    { href: "/iten", label: "Saturday" },
   ];
-  if (user) {
-    items.push({ href: "/games/suggest", label: "Suggest" });
-    items.push({ href: "/account", label: "My signups" });
-  }
   if (user?.isAdmin) {
-    items.push({ href: "/admin/games", label: "Admin" });
+    items.push({ href: "/admin", label: "Admin" });
+  } else if (!user) {
+    items.push({ href: "/signin", label: "Admin" });
   }
 
   return (
@@ -36,21 +34,17 @@ export async function SiteHeader() {
               {i.label}
             </Link>
           ))}
-          {user ? (
+          {user?.isAdmin ? (
             <form action={signOutAction}>
               <button type="submit" className="hover:text-fuchsia-300">
                 Sign out
               </button>
             </form>
-          ) : (
-            <Link href="/signin" className="hover:text-fuchsia-300">
-              Sign in
-            </Link>
-          )}
+          ) : null}
         </nav>
 
         {/* Mobile hamburger + drawer */}
-        <MobileNav items={items} isSignedIn={Boolean(user)} />
+        <MobileNav items={items} isSignedIn={Boolean(user?.isAdmin)} />
       </div>
     </header>
   );

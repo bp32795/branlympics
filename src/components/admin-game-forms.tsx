@@ -20,8 +20,16 @@ export function AddGameForm() {
   );
   return (
     <form action={action} className="space-y-3 border border-zinc-800 rounded-lg p-4">
-      <h2 className="font-semibold">New game</h2>
+      <h2 className="font-semibold">New activity</h2>
       <Field label="Title" name="title" required />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field
+          label="Saturday time"
+          name="scheduledFor"
+          type="datetime-local"
+        />
+        <Field label="Location" name="location" />
+      </div>
       <label className="block text-sm">
         <span className="text-zinc-300">Description</span>
         <textarea
@@ -31,18 +39,15 @@ export function AddGameForm() {
           className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:border-fuchsia-500"
         />
       </label>
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Min team size" name="minTeamSize" type="number" defaultValue={1} min={1} required />
-        <Field label="Max team size" name="maxTeamSize" type="number" defaultValue={1} min={1} required />
-      </div>
-      <GameImagePicker />
+      <input type="hidden" name="minTeamSize" value="1" />
+      <input type="hidden" name="maxTeamSize" value="1" />
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
       <button
         type="submit"
         disabled={pending}
         className="px-4 py-2 rounded-md bg-fuchsia-500 text-black font-semibold hover:bg-fuchsia-300 disabled:opacity-50"
       >
-        {pending ? "Saving…" : "Add game + notify everyone"}
+        {pending ? "Saving…" : "Add activity"}
       </button>
     </form>
   );
@@ -55,7 +60,7 @@ export function DeleteGameButton({ gameId }: { gameId: string }) {
       type="button"
       disabled={pending}
       onClick={() => {
-        if (!confirm("Delete this game and all signups?")) return;
+        if (!confirm("Delete this activity?")) return;
         start(() => deleteGameAction(gameId));
       }}
       className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50"
@@ -134,6 +139,15 @@ export function EditGameForm({ game }: { game: Game }) {
     >
       <input type="hidden" name="gameId" value={game.id} />
       <Field label="Title" name="title" defaultValue={game.title} required />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field
+          label="Saturday time"
+          name="scheduledFor"
+          type="datetime-local"
+          defaultValue={game.scheduledFor?.slice(0, 16)}
+        />
+        <Field label="Location" name="location" defaultValue={game.location} />
+      </div>
       <label className="block text-sm">
         <span className="text-zinc-300">Description</span>
         <textarea
@@ -144,25 +158,9 @@ export function EditGameForm({ game }: { game: Game }) {
           className="mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-md px-3 py-2 focus:outline-none focus:border-fuchsia-500"
         />
       </label>
-      <div className="grid grid-cols-2 gap-3">
-        <Field
-          label="Min team size"
-          name="minTeamSize"
-          type="number"
-          defaultValue={game.minTeamSize}
-          min={1}
-          required
-        />
-        <Field
-          label="Max team size"
-          name="maxTeamSize"
-          type="number"
-          defaultValue={game.maxTeamSize}
-          min={1}
-          required
-        />
-      </div>
-      <GameImagePicker initial={game.imageUrl} label="Game photo" />
+      <input type="hidden" name="minTeamSize" value={game.minTeamSize} />
+      <input type="hidden" name="maxTeamSize" value={game.maxTeamSize} />
+      <input type="hidden" name="imageUrl" value={game.imageUrl ?? ""} />
       {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
       <div className="flex items-center gap-3">
         <button

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Branlympics",
-  description: "Bachelor party games, signups & glory.",
+  description: "Branlympics weekend location and Saturday itinerary.",
 };
 
 export default function RootLayout({
